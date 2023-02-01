@@ -22,7 +22,6 @@
 
 
 import streamlit as st
-!pip install lightgbm
 import lightgbm as lgb
 
 import numpy as np
