@@ -27,6 +27,7 @@ import yfinance as yf
 import numpy as np
 import pandas as pd
 import requests
+from matplotlib import pyplot as plt
 
 # Fama French 49 industries
 # see https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/Data_Library/det_49_ind_port.html
@@ -141,7 +142,7 @@ diffusion = 0 #Diffusion
 
 dS = pd.DataFrame(np.full(N,S0))
 
-for t in tqdm(range(T)):
+for t in range(T):
     
     epsilon = np.random.normal(0, 1, N)  #Random Term which is normally distributed.
     drift += mu -.5*sigma2
@@ -206,7 +207,3 @@ st.write(X_df)
 '''In this app we use an [EBITDA] (https://en.wikipedia.org/wiki/Earnings_before_interest,_taxes,_depreciation_and_amortization) valuation multiple (EnterpriseValue/EBITDA), rather than the asset multiple (EnterpriseValue/TotalAssets) used in the working papers. While EBITDA [valuation multiples] (https://en.wikipedia.org/wiki/Valuation_using_multiples) are more commonly used in industry, it suffers from the drawback that it can only be used for firms with positive EBITDA (which is why we do not use it in the working papers).'''
 
 '''The machine learning model is trained on historical data spanning 40 years (1978 to 2019). Accounting data are from the Compustat quarterly accounting file and market data are from the CRSP monthly file. Accounting data are lagged 4 months to ensure it would have been available to the market at the time enterprise value is observed. The enterprise firm value is defined as the balance sheet equity market value adjusted for post-balance sheet stock returns plus the book value of debt at the balance sheet date. (This avoids complications due to capital market transactions post balance sheet date.) Quarterly accounting data are converted to annual equivalents by taking a 4-quarter running sum - this mitigates the effect of seasonality in reported accounting numbers. The model is trained on all common domestic US stocks (share code 10 or 11) with only a single class of stock issued. We exclude data points where any of total assets, book value, sales, EBITDA or firm value are either missing or negative. In addition we only keep firms with firm values ranked above the 20th percentile in each month (no small firms) and with EBITDA multiples between 1x and 100x (exclude outliers).'''
-
-"## About the Author (Dr Paul Geertsema)"
-
-'''I am a finance academic and consultant in the areas of finance, data science and machine learning. My research interests include empirical asset pricing, return predictability and the application of machine learning to finance problems. I currently teach "Modern Investment Theory and Management" (final-year undergraduate) and "Financial Machine Learning" (post-graduate) at the University of Auckland Business School. Prior to my return to academia I worked at Barclays Capital as a derivatives trader in Hong Kong and as a sell-side research analyst in London. I have also held positions at Credit Suisse, Citi and Audit New Zealand. My academic background includes a Bachelor of Accounting from Stellenbosch University, a B.Sc. Computer Science from the University of Auckland, an MBA from London Business School, a Master of Management (Economics) from Massey University and a PhD in Finance from the University of Auckland. I am a full member of Chartered Accountants Australia and New Zealand.'''
