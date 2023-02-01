@@ -22,7 +22,9 @@
 
 
 import streamlit as st
+!pip install lightgbm
 import lightgbm as lgb
+
 import numpy as np
 import pandas as pd
 import requests
