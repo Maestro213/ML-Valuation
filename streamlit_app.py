@@ -23,7 +23,7 @@
 
 import streamlit as st
 import lightgbm as lgb
-
+import yfinance as yf
 import numpy as np
 import pandas as pd
 import requests
@@ -96,6 +96,14 @@ st.sidebar.header("Valuation Inputs")
 selected_ff49 = st.sidebar.selectbox('Fama/French 49 Industry', ff49, index=0)
 industry = ff49.index(selected_ff49) + 1 # python is zero-indexed, FF49 starts at 1
 rate1yr  = st.sidebar.slider('1 Year Real Treasury Yield - %',  min_value = -5.0, max_value=12.0, step=0.1, value=2.0) / 100
+#
+sp500 = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
+ticker_list = np.array(sp500[0]['Symbol'])[:10]
+
+tickers = st.text_input("Tickers", ticker_list)
+tickers = tickers.split()
+tickers_data = yf.download(tickers, period="1d", interval="1y")
+
 
 # P&L
 sale     = st.sidebar.number_input('Sales - $ mn', min_value=0.0, max_value=100000.0, value=600.0, step=10.0)
@@ -105,6 +113,9 @@ ib       = st.sidebar.number_input('Income After Tax - $ mn', min_value=-100000.
 # Balancesheet
 debt     = st.sidebar.number_input('Total Debt - $ mn', min_value=0.0, max_value=100000.0, value=200.0, step=10.0)
 book     = st.sidebar.number_input('Book Value of Equity - $ mn', min_value=0.0, max_value=100000.0, value=300.0, step=10.0)
+
+
+
 
 # Calculated items
 
