@@ -25,7 +25,7 @@ import streamlit as st
 import lightgbm as lgb
 import yfinance as yf
 import numpy as np
-import pandas as pd
+#import pandas as pd
 import requests
 from matplotlib import pyplot as plt
 
