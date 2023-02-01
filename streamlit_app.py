@@ -102,8 +102,9 @@ ticker_list = np.array(sp500[0]['Symbol'])[:10]
 
 tickers = st.text_input("Tickers", ticker_list)
 tickers = tickers.split()
-tickers_data = yf.download(tickers, period="1d", interval="1y")
+tickers_data = yf.download(tickers, period="1d", interval="1y")["Adj Close"]
 
+N   = st.sidebar.number_input('Number of MC Sim ', min_value=0, max_value=1000000, value=10000, step=10)
 
 # P&L
 sale     = st.sidebar.number_input('Sales - $ mn', min_value=0.0, max_value=100000.0, value=600.0, step=10.0)
@@ -118,6 +119,43 @@ book     = st.sidebar.number_input('Book Value of Equity - $ mn', min_value=0.0,
 
 
 # Calculated items
+#Choose time period for the test set
+start_date = "2019-02-01"
+end_date = "2023-01-31"
+
+
+price_per = tickers_data#[price.index.year]
+
+
+#Use log returns for the model as in the Theory, instead of arithmetic 
+log_ret = np.log(price_per)-np.log(price_per.shift()).dropna()  
+mu = log_ret.mean()         #Average daily Return
+sigma2 = log_ret.var()      #Variance of the daily Returns
+sigma = np.sqrt(sigma2)     #Volatility of the daily Returns
+S0 = price_per.iloc[-1]
+
+T = 252        #Number of Predicted Days 
+N = N   #Number of MC Simulations
+drift = 0     #Drift
+diffusion = 0 #Diffusion
+
+dS = pd.DataFrame(np.full(N,S0))
+
+for t in tqdm(range(T)):
+    
+    epsilon = np.random.normal(0, 1, N)  #Random Term which is normally distributed.
+    drift += mu -.5*sigma2
+    diffusion += sigma *epsilon
+    St = pd.DataFrame(S0 * np.exp(drift + diffusion),columns=[str(t+1)]) #price at time t
+    
+    dS = pd.concat([dS,St],axis="columns")
+    
+dS = dS.T
+fig, ax = plt.subplots()
+plt.plot(dS.iloc[:,1:1000])
+st.pyplot(fig)
+
+#--------------------------------------------------------------------------------------------------------------------------------
 
 rate1yr_mc = rate1yr
 ib_eb   = ib/ebitda 
