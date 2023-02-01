@@ -1,242 +1,162 @@
-import pandas as pd
+# Machine Valuation Project
+# Copyright (C) Paul Geertsema, 2019-2021
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+# This project is loosely based on some of the ideas and approaches in
+# https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3447683
+# and
+# https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3740270
+
+
+import streamlit as st
+import lightgbm as lgb
 import numpy as np
-import scipy.stats as st
-import scipy.optimize as opt
+import pandas as pd
+import requests
 
-def drawdown(data: pd.DataFrame):
-    """
-    Takes a time series of asset prices, returns a DataFrame with columns for
-    the asset prices, the prior peaks, and the percentage drawdown
-    """
-    asset_price = data
-    prior_peak = asset_price.cummax()
-    drawdown = (asset_price - prior_peak) / prior_peak
-    max_drawdown = drawdown.cummin()
-    return pd.DataFrame({"Asset Price": asset_price, 
-                         "Prior Peak": prior_peak, 
-                         "Drawdown": drawdown,
-                        "Max Drawdown": max_drawdown})
+# Fama French 49 industries
+# see https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/Data_Library/det_49_ind_port.html
 
-def var_historic(data: pd.DataFrame, level = 99):
-    """
-    Takes a time series of asset returns, returns the historic
-    Value at Risk at a specified confidence level
-    """
-    return -np.percentile(data, (100 - level))
+ff49 = [
+    '1-Agriculture',
+    '2-Food Products',
+    '3-Candy & Soda',
+    '4-Beer & Liquor',
+    '5-Tobacco Products',
+    '6-Recreation',
+    '7-Entertainment',
+    '8-Printing and Publishing',
+    '9-Consumer Goods',
+    '10-Apparel',
+    '11-Healthcare',
+    '12-Medical Equipment',
+    '13-Pharmaceutical Products',
+    '14-Chemicals',
+    '15-Rubber and Plastic Products',
+    '16-Textiles',
+    '17-Construction Materials',
+    '18-Construction',
+    '19-Steel Works Etc',
+    '20-Fabricated Products',
+    '21-Machinery',
+    '22-Electrical Equipment',
+    '23-Automobiles and Trucks',
+    '24-Aircraft',
+    '25-Shipbuilding',
+    '26-Defense',
+    '27-Precious Metals',
+    '28-Non-Metallic and Industrial Metal Mining',
+    '29-Coal',
+    '30-Petroleum and Natural Gas',
+    '31-Utilities',
+    '32-Communication',
+    '33-Personal Services',
+    '34-Business Services',
+    '35-Computers',
+    '36-Computer Software',
+    '37-Electronic Equipment',
+    '38-Measuring and Control Equipment',
+    '39-Business Supplies',
+    '40-Shipping Containers',
+    '41-Transportation',
+    '42-Wholesale',
+    '43-Retail',
+    '44-Restaurants',
+    '45-Banking',
+    '46-Insurance',
+    '47-Real Estate',
+    '48-Trading',
+    '49-Almost Nothing or Missing'
+]
 
-def cvar_historic(data: pd.DataFrame, level = 99):
-    """
-    Takes a time series of asset returns, returns the historic
-    Conditional Value at Risk at a specified confidence level
-    """
-    is_beyond = data <= -var_historic(data, level = level)
-    return -data[is_beyond].mean()
+DATA = ''
 
-def var_cornfish(data: pd.DataFrame, level = 99):
-    """
-    Takes a time series of asset returns, returns the Cornish-Fisher
-    modified Value at Risk at a specified confidence level
-    """
-    # compute normal distribution z-score
-    z = st.norm.ppf((100 - level)/100)
-    # modify the z-score based on skewness and kurtosis
-    s = st.skew(data)
-    k = st.kurtosis(data, fisher = False)
-    z = (z +
-            (z**2 - 1)*s/6 +
-            (z**3 -3*z)*(k-3)/24 -
-            (2*z**3 - 5*z)*(s**2)/36)
-    # estimate the VaR based on modified z-score * std distance from the mean
-    return -(data.mean() + z * data.std(ddof=0))
+st.set_page_config(page_title='', page_icon=":dollar:", layout='centered', initial_sidebar_state='expanded')
+st.header('Machine Valuation')
+st.write('Enterprise Valuations Based on Machine Learned Associations')
+st.write('*Copyright (C) Paul Geertsema, 2019-2021 - see [code] (https://github.com/pgeertsema/machinevaluation) for licence*')
+st.write('WARNING: Experimental Research Project in Beta. Do **NOT** use for investment decisions!')
 
-def annualize_rets(r, periods_per_year):
-    """
-    Annualizes a set of returns given the periods per year
-    """
-    compounded_growth = (1+r).prod() 
-    n_periods = r.shape[0] 
-    return compounded_growth**(periods_per_year/n_periods)-1
+# Background
+st.sidebar.header("Valuation Inputs")
+selected_ff49 = st.sidebar.selectbox('Fama/French 49 Industry', ff49, index=0)
+industry = ff49.index(selected_ff49) + 1 # python is zero-indexed, FF49 starts at 1
+rate1yr  = st.sidebar.slider('1 Year Real Treasury Yield - %',  min_value = -5.0, max_value=12.0, step=0.1, value=2.0) / 100
 
-def annualize_vol(r, periods_per_year):
-    """
-    Annualizes the vol of a set of returns given the periods per year
-    """
-    return r.std()*(periods_per_year**0.5)
+# P&L
+sale     = st.sidebar.number_input('Sales - $ mn', min_value=0.0, max_value=100000.0, value=600.0, step=10.0)
+ebitda   = st.sidebar.number_input('EBITDA - $ mn', min_value=0.0, max_value=sale, value=100.0, step=10.0)
+ib       = st.sidebar.number_input('Income After Tax - $ mn', min_value=-100000.0, max_value=ebitda, value=40.0, step=10.0)
 
-def portfolio_return(weights, returns):
-    """
-    Computes the return on a portfolio from constituent returns and weights
-    weights and returns are an Nx1 matrix
-    """
-    # @ operator stands for matrix multiplication. 
-    # .T returns a transpose of an array
-    return weights.T @ returns 
+# Balancesheet
+debt     = st.sidebar.number_input('Total Debt - $ mn', min_value=0.0, max_value=100000.0, value=200.0, step=10.0)
+book     = st.sidebar.number_input('Book Value of Equity - $ mn', min_value=0.0, max_value=100000.0, value=300.0, step=10.0)
 
-def portfolio_vol(weights, covmat):
-    """
-    Computes the vol of a portfolio from a covariance matrix and constituent weights
-    weights are an N x 1 maxtrix and covmat is an N x N matrix
-    """
-    return (weights.T @ covmat @ weights)**0.5
+# Calculated items
 
-def minimize_vol(target_return, er, cov):
-    """
-    Returns the optimal weights that achieve the target return
-    given a set of expected returns and a covariance matrix
-    """
-    n = er.shape[0] #number of assets
-    init_guess = np.repeat(1/n, n) #equally weighted portfolio as an initial guess for the optimizer
-    bounds = ((0.0, 1.0),) * n #a set of 0% to 100% weight bounds for each asset
+rate1yr_mc = rate1yr
+ib_eb   = ib/ebitda 
+debt_eb = debt/ebitda 
+book_eb = book/ebitda 
+sale_eb = sale/ebitda 
 
-    #constraint: difference between sum of weigths and 1 is equal to 0 i.e. sum of weights has to be 100%
-    #"type":"eq" means equality
-    #"fun" stands for a function defining a constraing
-    # lambda is a special type of nameless functions in python that can be contained in one line of code
-    weights_sum_to_1 = {'type': 'eq',
-                        'fun': lambda weights: np.sum(weights) - 1}
-    #constraint: return is equal to the target return
-    #"args" stands for extra arguments
-    return_is_target = {'type': 'eq',
-                        'args': (er,),
-                        'fun': lambda weights, er: target_return - portfolio_return(weights,er)}
-    #runs the optimizer to minimize the volatility for a given return
-    #opt.minimize(the thing to be minimized, initial guess, extra arguments, minimization method (slsqp stands for sequantial least squares), optimization details, ...)
-    # (..., constraints (weights add up to 100%, target return is target return), bounds (individual weights are between 0 and 100%))
-    weights = opt.minimize(portfolio_vol, init_guess,
-                       args=(cov,), method='SLSQP',
-                       options={'disp': False},
-                       constraints=(weights_sum_to_1,return_is_target),
-                       bounds=bounds)
-    return weights.x #get the argument x
+loaded_model = lgb.Booster(model_file=DATA+'base_model.txt')
 
-def optimal_weights(n_points, er, cov):
-    """
-    Calculates optimal porfolio weights for n points between maximum and minimum possible return
-    """
-    #Get a linear space from min and max return possible of length n_points
-    target_rs = np.linspace(er.min(), er.max(), n_points)
-    #Get optimal weights for each of n_points returns
-    weights = [minimize_vol(target_return, er, cov) for target_return in target_rs]
-    return weights
+# Index(['book_eb', 'debt_eb', 'ib_eq', 'industry', 'rate1yr_mc', 'sale_eb'], dtype='object')
+X_dict = {'book_eb':book_eb, 'debt_eb':debt_eb, 'ib_eb':ib_eb, 'industry':industry, 'rate1yr_mc':rate1yr_mc, 'sale_eb':sale_eb}
 
-def plot_ef(n_points, er, cov):
-    """
-    Plots the multi-asset efficient frontier
-    """
-    #get weights for each element of the interpolated lin space
-    weights = optimal_weights(n_points, er, cov)
-    #get return and volatility for each weights pair
-    rets = [portfolio_return(w, er) for w in weights]
-    vols = [portfolio_vol(w, cov) for w in weights]
-    ef = pd.DataFrame({"Returns": rets, "Volatility": vols})
-    return ef.plot.line(x="Volatility", y="Returns", style='.-')
+# convert to list of values, sorted by feature name (order matters for predict)
+X = [X_dict[key] for key in sorted(X_dict.keys())]
 
-def msr(riskfree_rate, er, cov):
-    """
-    Returns the weights of the portfolio that gives you the maximum sharpe ratio
-    given the riskfree rate and expected returns and a covariance matrix
-    """
-    n = er.shape[0] 
-    init_guess = np.repeat(1/n, n) 
-    bounds = ((0.0, 1.0),) * n 
-    weights_sum_to_1 = {'type': 'eq',
-                        'fun': lambda weights: np.sum(weights) - 1}
-    #maximize function does not exist, thus what we will be doing is minimizing the negative sharpe ratio
-    def neg_sharpe(weights, riskfree_rate, er, cov):
-        """
-        Returns the negative of the sharpe ratio
-        of the given portfolio
-        """
-        r = portfolio_return(weights, er)
-        vol = portfolio_vol(weights, cov)
-        return -(r - riskfree_rate)/vol
+pred = loaded_model.predict(data=[X])
+multiple = round(np.exp(pred[0]),2)
+discountrate = round((1/multiple)*100,2)
+value = round(ebitda*multiple,0)
 
-    weights = opt.minimize(neg_sharpe, init_guess,
-                       args=(riskfree_rate, er, cov), method='SLSQP',
-                       options={'disp': False},
-                       constraints=(weights_sum_to_1,),
-                       bounds=bounds)
-    return weights.x
+st.header('Estimated EBITDA Valuation Multiple')
 
-def gmv(cov):
-    """
-    Returns the weights of the Global Minimum Volatility portfolio given a covariance matrix
-    """
-    # I love this function, what we are doing here is we are feeding the MSR optimizer the idea that all the returns are the same and the way it reacts
-    # is it starts to increase the SR by lowering volatility and does so until it reaches the point of lowest possible volatility
-    n = cov.shape[0]
-    return msr(0, np.repeat(1, n), cov)
+st.write(f"EBITDA multiple = ** {multiple} x **")
 
-def cppi(risky, safe, m = 2, start = 100, floor = 0.75, dynamic = False):
-    """
-    Runs a backtest of the CPPI strategy, returns 
-    a dataframe with Wealth, Floor, % of Wealth in Risky Asset and Cushion as % of Wealth.
-    risky -> pandas risky asset returns series
-    safe -> pandas safe asset returns series
-    m -> multiplier
-    start -> starting capital
-    floor -> cushion as % of starting capital
-    dynamic -> dynamic/non-dynamic floor
-    """
-    # set up the CPPI parameters
-    dates = risky.index
-    n_steps = len(dates)
-    account_value = start
-    floor_value = start * floor
-    peak = account_value
+st.header('Estimated Enterprise Valuation')
 
-    # set up some DataFrames for saving intermediate values
-    account_history = pd.DataFrame().reindex_like(pd.DataFrame(risky))
-    risky_w_history = pd.DataFrame().reindex_like(pd.DataFrame(risky))
-    cushion_history = pd.DataFrame().reindex_like(pd.DataFrame(risky))
-    floor_history = pd.DataFrame().reindex_like(pd.DataFrame(risky))
-    
-    # a for loop that does the backtest
-    for step in range(n_steps):
-    # if dynamic is true, peak is either previous peak or account value, floor value is peak * floor
-        if dynamic is True:
-            peak = np.maximum(peak, account_value)
-            floor_value = peak * (floor)
-        # calculations that correspond to the formulas on the picture
-        cushion = (account_value - floor_value)/account_value
-        risky_w = m * cushion
-        # we have to make sure the risky asset allocation is not bigger than 1 (can happen if you have a very big m)
-        # and not smaller than 0 (can happen when your total assets value goes below the floor value)
-        risky_w = np.minimum(risky_w, 1)
-        risky_w = np.maximum(risky_w, 0)
-        safe_w = 1 - risky_w
-        risky_alloc = account_value*risky_w
-        safe_alloc = account_value*safe_w
-        # recompute the new account value at the end of this step
-        account_value = risky_alloc*(1+risky.iloc[step]) + safe_alloc*(1+safe.iloc[step])
-        # save the histories for analysis and plotting
-        cushion_history.iloc[step] = cushion
-        risky_w_history.iloc[step] = risky_w
-        account_history.iloc[step] = account_value
-        floor_history.iloc[step] = floor_value
-    # combining the results
-    backtest_result = pd.concat([account_history, floor_history, risky_w_history, cushion_history], axis=1,
-                                keys = ["Wealth","Floor","% of Wealth in Risky Asset","Cushion as % of Wealth"])
-    # transforming keys to column names
-    backtest_result.columns = backtest_result.columns.get_level_values(0)
-    return backtest_result
+st.write(f"= EBITDA x EBITDA multiple = $ {ebitda} mn x {multiple} = **$ {value} mn**")
 
-def mc(n_years = 10, n_scenarios = 100, mu = 0.1, sigma = 0.1, steps_per_year = 52, start = 100.0):
-    """
-    Generates stock prices using Monte Carlo methodology
-    n_years -> number of years
-    n_scenarios -> number of scenarios
-    mu -> annualized return
-    sigma -> annualized volatility
-    steps_per_ year -> number of steps per year
-    start -> starting wealth
-    """
-    # calculate the annualization coefficient and the number of steps
-    ann = 1/steps_per_year
-    n_steps = int(n_years*steps_per_year) + 1
-    # calculate the returns for every time period using mu and sigma (loc = mean, scale = standard deviation, size = shape of the output)
-    rets_plus_1 = np.random.normal(loc = (1+mu)**ann, scale = (sigma*np.sqrt(ann)), size = (n_steps, n_scenarios))
-    # transform returns into prices (make the first row = 1), all the subsequent rows are a cumproduct
-    rets_plus_1[0] = 1
-    ret_val = start*pd.DataFrame(rets_plus_1).cumprod()
-    return ret_val
+st.header('Implied EBITDA Discount Rate (Zero Growth)')
+
+st.write(f"= 1 /  EBITDA multiple = 1 / {multiple} = ** {discountrate} % **")
+
+st.header("Variables Used")
+
+X_df = pd.DataFrame(X_dict, index=[0])
+st.write(X_df)
+
+"## How Does It Work?"
+
+'''The valuation methodology used in this app is loosely based on two of my working papers (joint with Dr Helen Lu); 
+[Machine Valuation] (https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3447683) and 
+[Relative Valuation with Machine Learning] (https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3740270)'''
+
+'''We use a machine learning algorithm to learn the historical association between accounting ratios and the EBITDA valutation multiple. The app uses this machine learning model to estimate the EBITDA ratio given the inputs provided (see input panel on the left).'''
+
+'''The machine learning algorithm we use is [LightGBM] (https://github.com/microsoft/LightGBM) from Microsoft Research. LightGBM is an implementation of a [Gradient Boosting Machine] (https://en.wikipedia.org/wiki/Gradient_boosting), which is an [ensemble] (https://en.wikipedia.org/wiki/Ensemble_learning) of [tree-based] (https://en.wikipedia.org/wiki/Decision_tree_learning) predictors.'''
+
+'''In this app we use an [EBITDA] (https://en.wikipedia.org/wiki/Earnings_before_interest,_taxes,_depreciation_and_amortization) valuation multiple (EnterpriseValue/EBITDA), rather than the asset multiple (EnterpriseValue/TotalAssets) used in the working papers. While EBITDA [valuation multiples] (https://en.wikipedia.org/wiki/Valuation_using_multiples) are more commonly used in industry, it suffers from the drawback that it can only be used for firms with positive EBITDA (which is why we do not use it in the working papers).'''
+
+'''The machine learning model is trained on historical data spanning 40 years (1978 to 2019). Accounting data are from the Compustat quarterly accounting file and market data are from the CRSP monthly file. Accounting data are lagged 4 months to ensure it would have been available to the market at the time enterprise value is observed. The enterprise firm value is defined as the balance sheet equity market value adjusted for post-balance sheet stock returns plus the book value of debt at the balance sheet date. (This avoids complications due to capital market transactions post balance sheet date.) Quarterly accounting data are converted to annual equivalents by taking a 4-quarter running sum - this mitigates the effect of seasonality in reported accounting numbers. The model is trained on all common domestic US stocks (share code 10 or 11) with only a single class of stock issued. We exclude data points where any of total assets, book value, sales, EBITDA or firm value are either missing or negative. In addition we only keep firms with firm values ranked above the 20th percentile in each month (no small firms) and with EBITDA multiples between 1x and 100x (exclude outliers).'''
+
+"## About the Author (Dr Paul Geertsema)"
+
+'''I am a finance academic and consultant in the areas of finance, data science and machine learning. My research interests include empirical asset pricing, return predictability and the application of machine learning to finance problems. I currently teach "Modern Investment Theory and Management" (final-year undergraduate) and "Financial Machine Learning" (post-graduate) at the University of Auckland Business School. Prior to my return to academia I worked at Barclays Capital as a derivatives trader in Hong Kong and as a sell-side research analyst in London. I have also held positions at Credit Suisse, Citi and Audit New Zealand. My academic background includes a Bachelor of Accounting from Stellenbosch University, a B.Sc. Computer Science from the University of Auckland, an MBA from London Business School, a Master of Management (Economics) from Massey University and a PhD in Finance from the University of Auckland. I am a full member of Chartered Accountants Australia and New Zealand.'''
