@@ -98,13 +98,14 @@ selected_ff49 = st.sidebar.selectbox('Fama/French 49 Industry', ff49, index=0)
 industry = ff49.index(selected_ff49) + 1 # python is zero-indexed, FF49 starts at 1
 rate1yr  = st.sidebar.slider('1 Year Real Treasury Yield - %',  min_value = -5.0, max_value=12.0, step=0.1, value=2.0) / 100
 #
+"""
 sp500 = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
 ticker_list = np.array(sp500[0]['Symbol'])[:10]
 
 tickers = st.text_input("Tickers", ticker_list)
 tickers = tickers.split()
 tickers_data = yf.download(tickers, period="1d", interval="1y")["Adj Close"]
-
+"""
 N   = st.sidebar.number_input('Number of MC Sim ', min_value=0, max_value=1000000, value=10000, step=10)
 
 # P&L
@@ -118,7 +119,7 @@ book     = st.sidebar.number_input('Book Value of Equity - $ mn', min_value=0.0,
 
 
 
-
+"""
 # Calculated items
 #Choose time period for the test set
 start_date = "2019-02-01"
@@ -155,7 +156,7 @@ dS = dS.T
 fig, ax = plt.subplots()
 plt.plot(dS.iloc[:,1:1000])
 st.pyplot(fig)
-
+"""
 #--------------------------------------------------------------------------------------------------------------------------------
 
 rate1yr_mc = rate1yr
