@@ -20,14 +20,11 @@
 # and
 # https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3740270
 
-
 import streamlit as st
 import lightgbm as lgb
-import yfinance as yf
 import numpy as np
 import pandas as pd
 import requests
-from matplotlib import pyplot as plt
 
 # Fama French 49 industries
 # see https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/Data_Library/det_49_ind_port.html
@@ -97,9 +94,6 @@ st.sidebar.header("Valuation Inputs")
 selected_ff49 = st.sidebar.selectbox('Fama/French 49 Industry', ff49, index=0)
 industry = ff49.index(selected_ff49) + 1 # python is zero-indexed, FF49 starts at 1
 rate1yr  = st.sidebar.slider('1 Year Real Treasury Yield - %',  min_value = -5.0, max_value=12.0, step=0.1, value=2.0) / 100
-#
-
-N   = st.sidebar.number_input('Number of MC Sim ', min_value=0, max_value=1000000, value=10000, step=10)
 
 # P&L
 sale     = st.sidebar.number_input('Sales - $ mn', min_value=0.0, max_value=100000.0, value=600.0, step=10.0)
@@ -110,8 +104,7 @@ ib       = st.sidebar.number_input('Income After Tax - $ mn', min_value=-100000.
 debt     = st.sidebar.number_input('Total Debt - $ mn', min_value=0.0, max_value=100000.0, value=200.0, step=10.0)
 book     = st.sidebar.number_input('Book Value of Equity - $ mn', min_value=0.0, max_value=100000.0, value=300.0, step=10.0)
 
-
-#--------------------------------------------------------------------------------------------------------------------------------
+# Calculated items
 
 rate1yr_mc = rate1yr
 ib_eb   = ib/ebitda 
@@ -148,6 +141,7 @@ st.header("Variables Used")
 
 X_df = pd.DataFrame(X_dict, index=[0])
 st.write(X_df)
+
 
 "## How Does It Work?"
 
