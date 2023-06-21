@@ -1,25 +1,3 @@
-# Machine Valuation Project
-# Copyright (C) Paul Geertsema, 2019-2021
-
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-# This project is loosely based on some of the ideas and approaches in
-# https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3447683
-# and
-# https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3740270
-
 import streamlit as st
 import lightgbm as lgb
 import numpy as np
@@ -141,18 +119,3 @@ st.header("Variables Used")
 
 X_df = pd.DataFrame(X_dict, index=[0])
 st.write(X_df)
-
-
-"## How Does It Work?"
-
-'''The valuation methodology used in this app is loosely based on two of my working papers (joint with Dr Helen Lu); 
-[Machine Valuation] (https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3447683) and 
-[Relative Valuation with Machine Learning] (https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3740270)'''
-
-'''We use a machine learning algorithm to learn the historical association between accounting ratios and the EBITDA valutation multiple. The app uses this machine learning model to estimate the EBITDA ratio given the inputs provided (see input panel on the left).'''
-
-'''The machine learning algorithm we use is [LightGBM] (https://github.com/microsoft/LightGBM) from Microsoft Research. LightGBM is an implementation of a [Gradient Boosting Machine] (https://en.wikipedia.org/wiki/Gradient_boosting), which is an [ensemble] (https://en.wikipedia.org/wiki/Ensemble_learning) of [tree-based] (https://en.wikipedia.org/wiki/Decision_tree_learning) predictors.'''
-
-'''In this app we use an [EBITDA] (https://en.wikipedia.org/wiki/Earnings_before_interest,_taxes,_depreciation_and_amortization) valuation multiple (EnterpriseValue/EBITDA), rather than the asset multiple (EnterpriseValue/TotalAssets) used in the working papers. While EBITDA [valuation multiples] (https://en.wikipedia.org/wiki/Valuation_using_multiples) are more commonly used in industry, it suffers from the drawback that it can only be used for firms with positive EBITDA (which is why we do not use it in the working papers).'''
-
-'''The machine learning model is trained on historical data spanning 40 years (1978 to 2019). Accounting data are from the Compustat quarterly accounting file and market data are from the CRSP monthly file. Accounting data are lagged 4 months to ensure it would have been available to the market at the time enterprise value is observed. The enterprise firm value is defined as the balance sheet equity market value adjusted for post-balance sheet stock returns plus the book value of debt at the balance sheet date. (This avoids complications due to capital market transactions post balance sheet date.) Quarterly accounting data are converted to annual equivalents by taking a 4-quarter running sum - this mitigates the effect of seasonality in reported accounting numbers. The model is trained on all common domestic US stocks (share code 10 or 11) with only a single class of stock issued. We exclude data points where any of total assets, book value, sales, EBITDA or firm value are either missing or negative. In addition we only keep firms with firm values ranked above the 20th percentile in each month (no small firms) and with EBITDA multiples between 1x and 100x (exclude outliers).'''
