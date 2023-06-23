@@ -9,8 +9,6 @@ from streamlit_lightweight_charts import renderLightweightCharts
 
 import json
 
-from lightweight_charts import Chart
-
 
 import yfinance as yf
 
