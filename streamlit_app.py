@@ -21,7 +21,7 @@ import yfinance as yf
 
 
 
-DATA = pd.read_csv(r'C:/Users/maest/OneDrive/Документы/Study/MSc Thesis/Data/Vars_small.csv')
+DATA = pd.read_csv(r'Vars_small.csv')
 ff49 = DATA.Industry.drop_duplicates().values.tolist()
 c = DATA['Country/Region Code '].drop_duplicates().values.tolist()
 # Background
@@ -235,7 +235,7 @@ renderLightweightCharts([
     }
 ], 'multipane')
 
-#DATA = pd.read_csv(r'C:/Users/maest/OneDrive/Документы/Study/MSc Thesis/Data/Vars_small.csv')
+
 
 #st.set_page_config(page_title='', page_icon=":dollar:", layout='centered', initial_sidebar_state='expanded')
 st.header('Machine Valuation')
