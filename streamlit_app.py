@@ -40,7 +40,7 @@ rate1yr  = st.sidebar.slider('1 Year Real Treasury Yield - %',  min_value = -5.0
 
 
 st.title(f'Firm   {Ticker}')
-st.header("Price and Volume Series Chart")
+st.header("Price and Volume")
 
    
  
@@ -246,30 +246,35 @@ comp_data = DATA[DATA["Ticker "]==Ticker]
 
 industry = DATA['Industry']
 #rate1yr  = st.sidebar.slider('1 Year Real Treasury Yield - %',  min_value = -5.0, max_value=12.0, step=0.1, value=2.0) / 100
-
+axis_v = ["FQ42022","FQ32022","FQ22022","FQ12022",
+          "FQ42021","FQ32021","FQ22021","FQ12021",
+          "FQ42020","FQ32020","FQ22020","FQ12020",
+          "FQ42019","FQ32019","FQ22019","FQ12019",
+          "FQ42018","FQ32018","FQ22018","FQ12018",
+          "FQ42017","FQ32017","FQ22017","FQ12017"]
 # P&L
-sale_val     = comp_data[[column for column in comp_data.columns if column.startswith('Total Revenue')]].values
-ebitda_val   = comp_data[[column for column in comp_data.columns if column.startswith('EBIT (')]].values
-ib_val       = comp_data[[column for column in comp_data.columns if column.startswith('Net Income (')]].values
+sale_val     = comp_data[[column for column in comp_data.columns if column.startswith('Total Revenue')]].set_axis(axis_v,axis=1)
+ebitda_val   = comp_data[[column for column in comp_data.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)
+ib_val       = comp_data[[column for column in comp_data.columns if column.startswith('Net Income (')]].set_axis(axis_v,axis=1)
 
 # Balancesheet
-debt_val     = comp_data[[column for column in comp_data.columns if column.startswith('Total Debt')]].values
-net_debt_val     = comp_data[[column for column in comp_data.columns if column.startswith('Net Debt')]].values
-book_val     = comp_data[[column for column in comp_data.columns if column.startswith('Common Stock')]].values
-mcap_val = comp_data[[column for column in comp_data.columns if column.startswith('MCap')]].values
-fr_fm_val = comp_data[[column for column in comp_data.columns if column.startswith('fr_fm')]].values
-
-
-
+debt_val     = comp_data[[column for column in comp_data.columns if column.startswith('Total Debt')]].set_axis(axis_v,axis=1)
+net_debt_val     = comp_data[[column for column in comp_data.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1)
+book_val     = comp_data[[column for column in comp_data.columns if column.startswith('Common Stock')]].set_axis(axis_v,axis=1)
+mcap_val = comp_data[[column for column in comp_data.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
+fr_fm_val = comp_data[[column for column in comp_data.columns if column.startswith('fr_fm')]].set_axis(axis_v,axis=1)
+fins = pd.concat([sale_val.T,ebitda_val.T,ib_val.T],axis=1).set_axis(["Sales","EBIT","Net Income"],axis = 1)/1000
+fins = fins.iloc[::-1]
+st.line_chart(fins)
 
 # P&L
-sale     = st.sidebar.number_input('Sales - $ mn', min_value=0.0, max_value=1000000.0,value=sale_val[0,1]/1000, step=10.0)
-ebitda   = st.sidebar.number_input('EBIT - $ mn', min_value=0.0, max_value=sale, value= ebitda_val[0,1]/1000, step=10.0)
-ib       = st.sidebar.number_input('Income After Tax - $ mn', min_value=-100000.0, max_value=1000000.0, value=ib_val[0,1]/1000, step=10.0)
+sale     = st.sidebar.number_input('Sales - $ mn', min_value=0.0, max_value=1000000.0,value=sale_val.values[0,1]/1000, step=10.0)
+ebitda   = st.sidebar.number_input('EBIT - $ mn', min_value=0.0, max_value=sale, value= ebitda_val.values[0,1]/1000, step=10.0)
+ib       = st.sidebar.number_input('Income After Tax - $ mn', min_value=-100000.0, max_value=1000000.0, value=ib_val.values[0,1]/1000, step=10.0)
 
 # Balancesheet
-debt     = st.sidebar.number_input('Total Debt - $ mn', min_value=0.0, max_value=1000000.0, value=debt_val[0,1]/1000 , step=10.0)
-book     = st.sidebar.number_input('Book Value of Equity - $ mn', min_value=0.0, max_value=1000000.0, value=book_val[0,1]/1000, step=10.0)
+debt     = st.sidebar.number_input('Total Debt - $ mn', min_value=0.0, max_value=1000000.0, value=debt_val.values[0,1]/1000 , step=10.0)
+book     = st.sidebar.number_input('Book Value of Equity - $ mn', min_value=0.0, max_value=1000000.0, value=book_val.values[0,1]/1000, step=10.0)
 
 # Calculated items
 
