@@ -236,9 +236,6 @@ renderLightweightCharts([
 
 
 #st.set_page_config(page_title='', page_icon=":dollar:", layout='centered', initial_sidebar_state='expanded')
-st.header('Machine Valuation')
-
-
 
 axis_v = ["FQ42022","FQ32022","FQ22022","FQ12022",
           "FQ42021","FQ32021","FQ22021","FQ12021",
@@ -310,20 +307,21 @@ pred = loaded_model.predict(data=[X])
 multiple = round(np.exp(pred[0]),2)
 discountrate = round((1/multiple)*100,2)
 value = round(ebitda*multiple,0)
+st.header('Machine Valuation')
 
-st.header('Estimated EBITDA Valuation Multiple')
+st.subheader('Estimated EBITDA Valuation Multiple')
 
 st.write(f"EBITDA multiple = ** {multiple} x **")
 
-st.header('Estimated Enterprise Valuation')
+st.subheader('Estimated Enterprise Valuation')
 
 st.write(f"= EBITDA x EBITDA multiple = $ {ebitda} mn x {multiple} = **$ {value} mn**")
 
-st.header('Implied EBITDA Discount Rate (Zero Growth)')
+st.subheader('Implied EBITDA Discount Rate (Zero Growth)')
 
 st.write(f"= 1 /  EBITDA multiple = 1 / {multiple} = ** {discountrate} % **")
 
-st.header("Variables Used")
+st.subheader("Variables Used")
 
 X_df = pd.DataFrame(X_dict, index=[0])
 st.write(X_df)
