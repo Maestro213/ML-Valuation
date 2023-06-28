@@ -351,7 +351,7 @@ st.write(f"EBIT multiple = **{multiple} x**")
 
 st.subheader('Estimated Enterprise Valuation')
 
-st.write(f"= EBIT x EBIT multiple = **$ {ebitda} mn x {multiple} = $ {value} mn**")
+st.write(f"= EBIT x EBIT multiple = $ **{ebitda} mn x {multiple} = $ {value} mn**")
 
 st.subheader('Implied EBIT Discount Rate (Zero Growth)')
 
