@@ -291,7 +291,7 @@ st.header("Financials")
 
 if Ticker in DATA["Ticker "].values:
    
-   
+   th= 3
    comp_data = DATA[DATA["Ticker "]==Ticker]
    
    # P&L
@@ -310,8 +310,8 @@ if Ticker in DATA["Ticker "].values:
    fins_bs = (pd.concat([debt_val.T,book_val.T],axis=1).set_axis(["Debt","Equity"],axis = 1)/1000).iloc[::-1] 
 
    #P/E
-   m_up,m_down = float(mcap_val.median(1)+mcap_val.std(1)*5), float(mcap_val.median(1)-mcap_val.std(1)*5)
-   ni_up,ni_down = float(ib_val.std(1)+ib_val.mean(1)*5), float(ib_val.mean(1)-ib_val.std(1)*5)
+   m_up,m_down = float(mcap_val.median(1)+mcap_val.std(1)*th), float(mcap_val.median(1)-mcap_val.std(1)*th)
+   ni_up,ni_down = float(ib_val.std(1)+ib_val.mean(1)*th), float(ib_val.mean(1)-ib_val.std(1)*th)
   
    mcap_peer =  DATA[[column for column in DATA.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
    mcap_peer = mcap_peer[(mcap_peer<=m_up)&(mcap_peer>=m_down)]
@@ -319,8 +319,8 @@ if Ticker in DATA["Ticker "].values:
    ni_peer = ni_peer[(ni_peer<=ni_up)&(ni_peer>=ni_down)]
    #EV/EBIT
   
-   sale_up,sale_down = float(sale_val.mean(1)+sale_val.std(1)*5), float(sale_val.mean(1)-sale_val.std(1)*5)
-   ebit_up,ebit_down = float(ib_val.std(1)+ib_val.mean(1)*5), float(ib_val.mean(1)-ib_val.std(1)*5)
+   sale_up,sale_down = float(sale_val.mean(1)+sale_val.std(1)*th), float(sale_val.mean(1)-sale_val.std(1)*th)
+   ebit_up,ebit_down = float(ib_val.std(1)+ib_val.mean(1)*th), float(ib_val.mean(1)-ib_val.std(1)*th)
   
    ev_peer = (mcap_peer - DATA[[column for column in DATA.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
    ebit_peer = DATA[[column for column in DATA.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)
