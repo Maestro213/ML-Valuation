@@ -248,7 +248,7 @@ if Ticker in DATA["Ticker "].values:
    sales_peer = DATA[[column for column in DATA.columns if column.startswith('Total Revenue')]].set_axis(axis_v,axis=1)
    sales_peer = sales_peer[(sales_peer<10**7)&((sales_peer>=0))]
    
-   peer_df = pd.concat([ev_peer.iloc[:,-2],sales_peer.iloc[:,-2],ebit_peer.iloc[:,-2],mcap_peer.iloc[:,-2],ni_peer.iloc[:,-2],DATA["Industry"]]
+   peer_df = pd.concat([ev_peer.mean(),sales_peer.mean(),ebit_peer.mean(),mcap_peer.mean(),ni_peer.mean(),DATA["Industry"]]
                        ,axis=1).set_axis(["EV","Sales","EBIT","MCap","Net Income","Industry"],axis=1).dropna()
    
    comp_data = DATA[DATA["Ticker "]==Ticker]
