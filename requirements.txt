@@ -7,7 +7,7 @@ yfinance==0.2.9.
 matplotlib==3.6.3
 streamlit_lightweight_charts == 0.7.20 
 pandas_ta == 0.3.14b0
-st_lottie == 0.0.5.
+streamlit_lottie == 0.0.5.
 
 
 
