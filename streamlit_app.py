@@ -262,10 +262,19 @@ if Ticker in DATA["Ticker "].values:
    ev = mcap_val + net_debt_val
    fins_cf = (pd.concat([sale_val.T,ebitda_val.T,ib_val.T],axis=1).set_axis(["Sales","EBIT","Net Income"],axis = 1)/1000).iloc[::-1]
    fins_bs = (pd.concat([debt_val.T,book_val.T],axis=1).set_axis(["Debt","Equity"],axis = 1)/1000).iloc[::-1]        
-   #fins_cf = fins_cf
+   #Plotting the results
    
-   st.area_chart(fins_cf, use_container_width=False)
-   st.bar_chart(fins_bs, use_container_width=False)
+   data_container = st.container()
+   with data_container:
+    plot1, plot2 = st.columns(2)
+    with plot1:
+        st.area_chart(fins_cf, use_container_width=False)
+    with plot2:
+        st.bar_chart(fins_bs, use_container_width=False)
+   
+   
+
+   
    chart = alt.Chart(peer_df).mark_circle().encode(x='Sales',y='EV',color='Industry',).interactive()
    st.altair_chart(chart, theme="streamlit", use_container_width=True)
 else:
