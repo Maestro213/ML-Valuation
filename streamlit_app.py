@@ -314,9 +314,9 @@ if Ticker in DATA["Ticker "].values:
    ni_up,ni_down = float(ib_val_val.std(1)+ev.mean(1)), float(ib_val.mean(1)-ev.std(1))
   
    mcap_peer =  DATA[[column for column in DATA.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
-   mcap_peer = mcap_peer[(mcap_peer<=m_up)&((mcap_peer>=m_down)]
+   mcap_peer = mcap_peer[(mcap_peer<=m_up)&(mcap_peer>=m_down)]
    ni_peer = DATA[[column for column in DATA.columns if column.startswith('Net Income (')]].set_axis(axis_v,axis=1)
-   ni_peer = ni_peer[(ni_peer<=ni_up)&((ni_peer>=ni_down))]
+   ni_peer = ni_peer[(ni_peer<=ni_up)&(ni_peer>=ni_down)]
    #EV/EBIT
    ev_peer = (mcap_peer - DATA[[column for column in DATA.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
    ebit_peer = DATA[[column for column in DATA.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)
