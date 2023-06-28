@@ -266,12 +266,12 @@ if Ticker in DATA["Ticker "].values:
    fr_fm_val = comp_data[[column for column in comp_data.columns if column.startswith('fr_fm')]].set_axis(axis_v,axis=1)
    ev = mcap_val + net_debt_val
    fins_cf = (pd.concat([sale_val.T,ebitda_val.T,ib_val.T],axis=1).set_axis(["Sales","EBIT","Net Income"],axis = 1)/1000).iloc[::-1]
-   fins_bs = (pd.concat([debt_val.T,book_val.T]).set_axis(["Debt","Equity"],axis = 1)/1000).iloc[::-1]        
+   fins_bs = (pd.concat([debt_val.T,book_val.T],axis=1).set_axis(["Debt","Equity"],axis = 1)/1000).iloc[::-1]        
    #fins_cf = fins_cf
    
    st.area_chart(fins_cf, use_container_width=False)
    st.bar_chart(fins_bs, use_container_width=False)
-   chart = alt.Chart(peer_df).mark_circle().encode(x='EBIT',y='EV',color='Origin',).interactive()
+   chart = alt.Chart(peer_df).mark_circle().encode(x='EBIT',y='EV',color='Industry',).interactive()
    st.altair_chart(chart, theme="streamlit", use_container_width=True)
 else:
    st.write("Ops, the ticker you've chosen is not available at current moment. We are working hard to improve our product and will add your desired company into our dataset")
@@ -281,10 +281,10 @@ else:
    ib_val       = 2500.0
    # Balancesheet
    debt_val     = 10000.0
-   net_debt_val     = 1000.0
+   net_debt_val = 1000.0
    book_val     = 100000.0
-   mcap_val = "Not available at the current moment"
-   fr_fm_val = 1
+   mcap_val     = "Not available at the current moment"
+   fr_fm_val    = 1
    
 # P&L
 sale     = st.sidebar.number_input('Sales - $ mn', min_value=0.0, max_value=1000000.0,value=sale_val.values[0,1]/1000, step=10.0)
