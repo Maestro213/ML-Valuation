@@ -246,9 +246,9 @@ st.header("Financials")
 if Ticker in DATA["Ticker "].values:
    #EV vs EBIT
    ev_peer =  DATA[[column for column in DATA.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
-   ev_peer = (ev_peer - DATA[[column for column in DATA.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
-   ebit_peer = DATA[[column for column in DATA.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)/1000
-   peer_df = pd.concat([ev_peer.mean(axis=1),ebit_peer.mean(axis=1),DATA["Industry"]],axis=1).set_axis(["EV","EBIT","Industry"],axis=1)
+   ev_peer = (ev_peer - DATA[[column for column in DATA.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))/1000
+   ebit_peer = DATA[[column for column in DATA.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)*1000
+   peer_df = pd.concat([ev_peer.mean(axis=1),ebit_peer.mean(axis=1),DATA["Industry"]],axis=1).set_axis(["EV","EBIT","Industry"],axis=1).dropna()
    
    
    comp_data = DATA[DATA["Ticker "]==Ticker]
