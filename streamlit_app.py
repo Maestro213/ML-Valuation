@@ -115,9 +115,9 @@ chartMultipaneOptions = [
         "layout": {
             "background": {
                 "type": "solid",
-                "color": 'white'
+                "color": 'black'
             },
-            "textColor": "black"
+            "textColor": "white"
         },
         "grid": {
             "vertLines": {
@@ -154,7 +154,7 @@ chartMultipaneOptions = [
                 "type": 'solid',
                 "color": 'transparent'
             },
-            "textColor": 'black',
+            "textColor": 'white',
         },
         "grid": {
             "vertLines": {
@@ -182,9 +182,9 @@ chartMultipaneOptions = [
         "layout": {
             "background": {
                 "type": "solid",
-                "color": 'white'
+                "color": 'black'
             },
-            "textColor": "black"
+            "textColor": "white"
         },
         "timeScale": {
             "visible": False,
