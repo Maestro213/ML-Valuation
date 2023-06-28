@@ -359,13 +359,11 @@ if Ticker in DATA["Ticker "].values:
 
 else:
   st.write("Ops, the ticker you've chosen is not available at current moment. We are working hard to improve our product and will add your desired company into our dataset")
-  url = requests.get("https://assets9.lottiefiles.com/packages/lf20_3kjzsbjv.json")
-  # Creating a blank dictionary to store JSON file,
-  # as their structure is similar to Python Dictionary
-  url_json = url.json()
-
   
-  st_lottie(url_json)
+
+  lottie_url = https://assets9.lottiefiles.com/packages/lf20_3kjzsbjv.json
+  st_lottie(lottie_url,key="user")
+  
   sale_val     = 10000.0
   ebitda_val   = 5000.0
   ib_val       = 2500.0
