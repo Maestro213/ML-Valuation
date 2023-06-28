@@ -246,9 +246,11 @@ st.header("Financials")
 if Ticker in DATA["Ticker "].values:
    #EV vs EBIT
    ev_peer =  DATA[[column for column in DATA.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
-   ev_peer = (ev_peer - DATA[[column for column in DATA.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))/1000
-   ebit_peer = DATA[[column for column in DATA.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)
-   peer_df = pd.concat([ev_peer.mean(axis=1),ebit_peer.mean(axis=1),DATA["Industry"]],axis=1).set_axis(["EV","EBIT","Industry"],axis=1).dropna()
+   ev_peer = (ev_peer - DATA[[column for column in DATA.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
+   ev_peer = ev_peer[ev_peer<=1*10**14]
+   sales_peer = DATA[[column for column in DATA.columns if column.startswith('Total Revenue')]].set_axis(axis_v,axis=1)
+   sales_peer = sales_peer[(sales_peer<10**6)&((sales_peer>=0))]
+   peer_df = pd.concat([ev_peer.iloc[:,-2],sales_peer.iloc[:,-2],DATA["Industry"]],axis=1).set_axis(["EV","Sales","Industry"],axis=1).dropna()
    
    
    comp_data = DATA[DATA["Ticker "]==Ticker]
