@@ -290,19 +290,7 @@ axis_v = ["FQ42022","FQ32022","FQ22022","FQ12022",
 st.header("Financials")
 
 if Ticker in DATA["Ticker "].values:
-   #EV vs EBIT
-   mcap_peer =  DATA[[column for column in DATA.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
-   mcap_peer = mcap_peer[mcap_peer<=1*10**14]
-   ni_peer = DATA[[column for column in DATA.columns if column.startswith('Net Income (')]].set_axis(axis_v,axis=1)
-   ni_peer = ni_peer[(ni_peer<10**6)&((ni_peer>-10**5))]
-   ev_peer = (mcap_peer - DATA[[column for column in DATA.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
-   ebit_peer = DATA[[column for column in DATA.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)
-   ebit_peer = ebit_peer[(ebit_peer<10**6)&((ebit_peer>=-0.5*10*3))]
-   sales_peer = DATA[[column for column in DATA.columns if column.startswith('Total Revenue')]].set_axis(axis_v,axis=1)
-   sales_peer = sales_peer[(sales_peer<10**7)&((sales_peer>=0))]
    
-   peer_df = pd.concat([ev_peer.median(axis=1),sales_peer.median(axis=1),ebit_peer.median(axis=1),mcap_peer.median(axis=1),ni_peer.median(axis=1),DATA["Industry"]]
-                       ,axis=1).set_axis(["EV","Sales","EBIT","MCap","Net Income","Industry"],axis=1).dropna()
    
    comp_data = DATA[DATA["Ticker "]==Ticker]
    
@@ -321,6 +309,25 @@ if Ticker in DATA["Ticker "].values:
    fins_cf = (pd.concat([sale_val.T,ebitda_val.T,ib_val.T],axis=1).set_axis(["Sales","EBIT","Net Income"],axis = 1)/1000).iloc[::-1]
    fins_bs = (pd.concat([debt_val.T,book_val.T],axis=1).set_axis(["Debt","Equity"],axis = 1)/1000).iloc[::-1] 
 
+   #P/E
+   m_up,m_down = float(mcap_val.std(1)+ev.mean(1)), float(mcap_val.mean(1)-ev.std(1))
+   ni_up,ni_down = float(ib_val_val.std(1)+ev.mean(1)), float(ib_val.mean(1)-ev.std(1))
+  
+   mcap_peer =  DATA[[column for column in DATA.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
+   mcap_peer = mcap_peer[(mcap_peer<=m_up)&((mcap_peer>=m_down)]
+   ni_peer = DATA[[column for column in DATA.columns if column.startswith('Net Income (')]].set_axis(axis_v,axis=1)
+   ni_peer = ni_peer[(ni_peer<=ni_up)&((ni_peer>=ni_down))]
+   #EV/EBIT
+   ev_peer = (mcap_peer - DATA[[column for column in DATA.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
+   ebit_peer = DATA[[column for column in DATA.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)
+   ebit_peer = ebit_peer[(ebit_peer<10**6)&((ebit_peer>=-0.5*10*3))]
+   sales_peer = DATA[[column for column in DATA.columns if column.startswith('Total Revenue')]].set_axis(axis_v,axis=1)
+   sales_peer = sales_peer[(sales_peer<10**7)&((sales_peer>=0))]
+   
+   peer_df = pd.concat([ev_peer.median(axis=1),sales_peer.median(axis=1),ebit_peer.median(axis=1),mcap_peer.median(axis=1),ni_peer.median(axis=1),DATA["Industry"]]
+                       ,axis=1).set_axis(["EV","Sales","EBIT","MCap","Net Income","Industry"],axis=1).dropna()
+   
+  
    #Rearrange Values
    sale_val     = sale_val.values[0,1]/1000
    ebitda_val   = ebitda_val.values[0,1]/1000
