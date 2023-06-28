@@ -345,17 +345,17 @@ discountrate = round((1/multiple)*100,2)
 value = round(ebitda*multiple,0)
 st.header('Machine Valuation')
 
-st.subheader('Estimated EBITDA Valuation Multiple')
+st.subheader('Estimated EBIT Valuation Multiple')
 
-st.write(f"EBITDA multiple = **{multiple} x**")
+st.write(f"EBIT multiple = **{multiple} x**")
 
 st.subheader('Estimated Enterprise Valuation')
 
-st.write(f"= EBITDA x EBITDA multiple = $ {ebitda} mn x {multiple} = **$ {value} mn**")
+st.write(f"= EBIT x EBIT multiple = **$ {ebitda} mn** x {multiple} = **$ {value} mn**")
 
-st.subheader('Implied EBITDA Discount Rate (Zero Growth)')
+st.subheader('Implied EBIT Discount Rate (Zero Growth)')
 
-st.write(f"= 1 /  EBITDA multiple = 1 / {multiple} = ** {discountrate} % **")
+st.write(f"= 1 /  EBIT multiple = 1 / {multiple} = **{discountrate} %**")
 
 st.subheader("Variables Used")
 
