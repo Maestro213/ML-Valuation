@@ -273,9 +273,19 @@ if Ticker in DATA["Ticker "].values:
         st.bar_chart(fins_bs, use_container_width=False)
    
    
+   chart1 = alt.Chart(peer_df).mark_circle().encode(x='Sales',y='EV',color='Industry',).interactive()
+   chart2 = alt.Chart(peer_df).mark_circle().encode(x='Sales',y='EV',color='Industry',).interactive()
+   
+   tab1, tab2 = st.tabs(["Streamlit ", "Altair native theme"])
 
-   chart = alt.Chart(peer_df).mark_circle().encode(x='Sales',y='Industry',color='EV',).interactive()
-   st.altair_chart(chart, theme="streamlit", use_container_width=True)
+   with tab1:
+       # Use the Streamlit theme.
+       st.altair_chart(chart1, theme="streamlit", use_container_width=True)
+   with tab2:
+       # Use the native Altair theme.
+       st.altair_chart(chart2, theme=None, use_container_width=True)
+      
+      
 
 
 else:
