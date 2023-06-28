@@ -359,7 +359,7 @@ if Ticker in DATA["Ticker "].values:
 
 else:
   st.write("Ops, the ticker you've chosen is not available at current moment. We are working hard to improve our product and will add your desired company into our dataset")
-  url = requests.get("https://iconscout.com/lottie/stock-market-chart-8833053.json")
+  url = requests.get("https://assets9.lottiefiles.com/packages/lf20_3kjzsbjv.json")
   # Creating a blank dictionary to store JSON file,
   # as their structure is similar to Python Dictionary
   url_json = url.json()
