@@ -7,7 +7,6 @@ import streamlit as st
 from streamlit_lightweight_charts import renderLightweightCharts
 import json
 import altair as alt
-from vega_datasets import data
 
 import yfinance as yf
 
