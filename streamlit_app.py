@@ -246,9 +246,9 @@ st.header("Financials")
 
 if Ticker in DATA["Ticker "].values:
    #EV vs EBIT
-   ev_peer =  comp_data[[column for column in comp_data.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
-   ev_peer = (ev_peer - comp_data[[column for column in comp_data.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
-   ebit_peer = comp_data[[column for column in comp_data.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)/1000
+   ev_peer =  DATA[[column for column in DATA.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
+   ev_peer = (ev_peer - DATA[[column for column in DATA.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
+   ebit_peer = DATA[[column for column in DATA.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)/1000
    peer_df = pd.concat([ev_peer.mean(axis=1),ebit_peer.mean(axis=1),DATA["Industry"]],axis=1).set_axis(["EV","EBIT","Industry"],axis=1)
    
    
@@ -267,7 +267,7 @@ if Ticker in DATA["Ticker "].values:
    fr_fm_val = comp_data[[column for column in comp_data.columns if column.startswith('fr_fm')]].set_axis(axis_v,axis=1)
    ev = mcap_val + net_debt_val
    fins_cf = (pd.concat([sale_val.T,ebitda_val.T,ib_val.T],axis=1).set_axis(["Sales","EBIT","Net Income"],axis = 1)/1000).iloc[::-1]
-   fins_bs = (pd.concat([debt_val.T,book_val.T].set_axis(["Debt","Equity"],axis = 1)/1000).iloc[::-1]        
+   fins_bs = (pd.concat([debt_val.T,book_val.T]).set_axis(["Debt","Equity"],axis = 1)/1000).iloc[::-1]        
    #fins_cf = fins_cf
    
    st.area_chart(fins_cf, use_container_width=False)
@@ -286,7 +286,7 @@ else:
    book_val     = 100000.0
    mcap_val = "Not available at the current moment"
    fr_fm_val = 1
-    
+   
 # P&L
 sale     = st.sidebar.number_input('Sales - $ mn', min_value=0.0, max_value=1000000.0,value=sale_val.values[0,1]/1000, step=10.0)
 ebitda   = st.sidebar.number_input('EBIT - $ mn', min_value=0.0, max_value=sale, value= ebitda_val.values[0,1]/1000, step=10.0)
