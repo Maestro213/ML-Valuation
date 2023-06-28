@@ -318,14 +318,15 @@ if Ticker in DATA["Ticker "].values:
    ni_peer = DATA[[column for column in DATA.columns if column.startswith('Net Income (')]].set_axis(axis_v,axis=1)
    ni_peer = ni_peer[(ni_peer<=ni_up)&(ni_peer>=ni_down)]
    #EV/EBIT
-   sales_up,sale_down = float(sales_val.mean(1)+sales_val.std(1)*5), float(sales_val.mean(1)-sales_val.std(1)*5)
+  
+   sale_up,sale_down = float(sale_val.mean(1)+sale_val.std(1)*5), float(sale_val.mean(1)-sale_val.std(1)*5)
    ebit_up,ebit_down = float(ebit_val.std(1)+ebit_val.mean(1)*5), float(ib_val.mean(1)-ib_val.std(1)*5)
   
    ev_peer = (mcap_peer - DATA[[column for column in DATA.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
    ebit_peer = DATA[[column for column in DATA.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)
    ebit_peer = ebit_peer[(ebit_peer<=ebit_up)&((ebit_peer>=ebit_down))]
    sales_peer = DATA[[column for column in DATA.columns if column.startswith('Total Revenue')]].set_axis(axis_v,axis=1)
-   sales_peer = sales_peer[(sales_peer<10**7)&((sales_peer>=0))]
+   sales_peer = sales_peer[(sales_peer<=sale_up)&((sales_peer>=0))]
    
    peer_df = pd.concat([ev_peer.median(axis=1),sales_peer.median(axis=1),ebit_peer.median(axis=1),mcap_peer.median(axis=1),ni_peer.median(axis=1),DATA["Industry"]]
                        ,axis=1).set_axis(["EV","Sales","EBIT","MCap","Net Income","Industry"],axis=1).dropna()
