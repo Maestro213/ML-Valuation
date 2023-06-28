@@ -263,7 +263,7 @@ mcap_val = comp_data[[column for column in comp_data.columns if column.startswit
 fr_fm_val = comp_data[[column for column in comp_data.columns if column.startswith('fr_fm')]].set_axis(axis_v,axis=1)
 fins = pd.concat([sale_val.T,ebitda_val.T,ib_val.T],axis=1).set_axis(["Sales","EBIT","Net Income"],axis = 1)/1000
 fins = fins.iloc[::-1]
-st.area_chart(fins,y=["Sales","EBIT","Net Income"])
+st.area_chart(fins)
 
 # P&L
 sale     = st.sidebar.number_input('Sales - $ mn', min_value=0.0, max_value=1000000.0,value=sale_val.values[0,1]/1000, step=10.0)
