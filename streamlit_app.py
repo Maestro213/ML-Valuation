@@ -245,47 +245,47 @@ axis_v = ["FQ42022","FQ32022","FQ22022","FQ12022",
 st.header("Financials")
 
 if Ticker in DATA["Ticker "].values:
-    #EV vs EBIT
-    ev_peer =  comp_data[[column for column in comp_data.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
-    ev_peer = (ev_peer - comp_data[[column for column in comp_data.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
-    ebit_peer = comp_data[[column for column in comp_data.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)/1000
-    peer_df = pd.concat([ev_peer.mean(axis=1),ebit_peer.mean(axis=1),DATA["Industry"]],axis=1).set_axis(["EV","EBIT","Industry"],axis=1)
-    chart = alt.Chart(source).mark_circle().encode(x='Horsepower',y='Miles_per_Gallon', color='Origin',).interactive()
-    st.altair_chart(chart, theme="streamlit", use_container_width=True)
+   #EV vs EBIT
+   ev_peer =  comp_data[[column for column in comp_data.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
+   ev_peer = (ev_peer - comp_data[[column for column in comp_data.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
+   ebit_peer = comp_data[[column for column in comp_data.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)/1000
+   peer_df = pd.concat([ev_peer.mean(axis=1),ebit_peer.mean(axis=1),DATA["Industry"]],axis=1).set_axis(["EV","EBIT","Industry"],axis=1)
    
-    comp_data = DATA[DATA["Ticker "]==Ticker]
-
-    # P&L
-    sale_val     = comp_data[[column for column in comp_data.columns if column.startswith('Total Revenue')]].set_axis(axis_v,axis=1)
-    ebitda_val   = comp_data[[column for column in comp_data.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)
-    ib_val       = comp_data[[column for column in comp_data.columns if column.startswith('Net Income (')]].set_axis(axis_v,axis=1)
-    
-    # Balancesheet
-    debt_val     = comp_data[[column for column in comp_data.columns if column.startswith('Total Debt')]].set_axis(axis_v,axis=1)
-    net_debt_val     = comp_data[[column for column in comp_data.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1)
-    book_val     = comp_data[[column for column in comp_data.columns if column.startswith('Common Stock')]].set_axis(axis_v,axis=1)
-    mcap_val = comp_data[[column for column in comp_data.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
-    fr_fm_val = comp_data[[column for column in comp_data.columns if column.startswith('fr_fm')]].set_axis(axis_v,axis=1)
-    ev = mcap_val + net_debt_val
-    fins_cf = (pd.concat([sale_val.T,ebitda_val.T,ib_val.T],axis=1).set_axis(["Sales","EBIT","Net Income"],axis = 1)/1000).iloc[::-1]
-    fins_bs = (pd.concat([debt_val.T,book_val.T].set_axis(["Debt","Equity"],axis = 1)/1000).iloc[::-1]        
-    #fins_cf = fins_cf
-    
-    st.area_chart(fins_cf, use_container_width=False)
-    st.bar_chart(fins_bs, use_container_width=False)
-    st.
+   
+   comp_data = DATA[DATA["Ticker "]==Ticker]
+   
+   # P&L
+   sale_val     = comp_data[[column for column in comp_data.columns if column.startswith('Total Revenue')]].set_axis(axis_v,axis=1)
+   ebitda_val   = comp_data[[column for column in comp_data.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)
+   ib_val       = comp_data[[column for column in comp_data.columns if column.startswith('Net Income (')]].set_axis(axis_v,axis=1)
+   
+   # Balancesheet
+   debt_val     = comp_data[[column for column in comp_data.columns if column.startswith('Total Debt')]].set_axis(axis_v,axis=1)
+   net_debt_val     = comp_data[[column for column in comp_data.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1)
+   book_val     = comp_data[[column for column in comp_data.columns if column.startswith('Common Stock')]].set_axis(axis_v,axis=1)
+   mcap_val = comp_data[[column for column in comp_data.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
+   fr_fm_val = comp_data[[column for column in comp_data.columns if column.startswith('fr_fm')]].set_axis(axis_v,axis=1)
+   ev = mcap_val + net_debt_val
+   fins_cf = (pd.concat([sale_val.T,ebitda_val.T,ib_val.T],axis=1).set_axis(["Sales","EBIT","Net Income"],axis = 1)/1000).iloc[::-1]
+   fins_bs = (pd.concat([debt_val.T,book_val.T].set_axis(["Debt","Equity"],axis = 1)/1000).iloc[::-1]        
+   #fins_cf = fins_cf
+   
+   st.area_chart(fins_cf, use_container_width=False)
+   st.bar_chart(fins_bs, use_container_width=False)
+   chart = alt.Chart(peer_df).mark_circle().encode(x='EBIT',y='EV',color='Origin',).interactive()
+   st.altair_chart(chart, theme="streamlit", use_container_width=True)
 else:
-    st.write("Ops, the ticker you've chosen is not available at current moment. We are working hard to improve our product and will add your desired company into our dataset")
-    
-    sale_val     = 10000.0
-    ebitda_val   = 5000.0
-    ib_val       = 2500.0
-    # Balancesheet
-    debt_val     = 10000.0
-    net_debt_val     = 1000.0
-    book_val     = 100000.0
-    mcap_val = "Not available at the current moment"
-    fr_fm_val = 1
+   st.write("Ops, the ticker you've chosen is not available at current moment. We are working hard to improve our product and will add your desired company into our dataset")
+   
+   sale_val     = 10000.0
+   ebitda_val   = 5000.0
+   ib_val       = 2500.0
+   # Balancesheet
+   debt_val     = 10000.0
+   net_debt_val     = 1000.0
+   book_val     = 100000.0
+   mcap_val = "Not available at the current moment"
+   fr_fm_val = 1
     
 # P&L
 sale     = st.sidebar.number_input('Sales - $ mn', min_value=0.0, max_value=1000000.0,value=sale_val.values[0,1]/1000, step=10.0)
