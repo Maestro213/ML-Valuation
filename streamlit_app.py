@@ -370,19 +370,19 @@ else:
       print("Error in the URL")
       
   
-st.title("Adding Lottie Animation in Streamlit WebApp")
-  
-st_lottie(url_json)
-   sale_val     = 10000.0
-   ebitda_val   = 5000.0
-   ib_val       = 2500.0
-   # Balancesheet
-   debt_val     = 10000.0
-   net_debt_val = 1000.0
-   book_val     = 100000.0
-   mcap_val     = "Not available at the current moment"
-   fr_fm_val    = 1
 
+  
+  st_lottie(url_json)
+  sale_val     = 10000.0
+  ebitda_val   = 5000.0
+  ib_val       = 2500.0
+  # Balancesheet
+  debt_val     = 10000.0
+  net_debt_val = 1000.0
+  book_val     = 100000.0
+  mcap_val     = "Not available at the current moment"
+  fr_fm_val    = 1
+  
 
 #Categorical
 country = c.index(selected_country) + 1 
