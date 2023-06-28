@@ -3,12 +3,11 @@ import lightgbm as lgb
 import numpy as np
 import pandas as pd
 import pandas_ta as ta
-
 import streamlit as st
 from streamlit_lightweight_charts import renderLightweightCharts
-
 import json
-
+import altair as alt
+from vega_datasets import data
 
 import yfinance as yf
 
@@ -243,11 +242,18 @@ axis_v = ["FQ42022","FQ32022","FQ22022","FQ12022",
           "FQ42019","FQ32019","FQ22019","FQ12019",
           "FQ42018","FQ32018","FQ22018","FQ12018",
           "FQ42017","FQ32017","FQ22017","FQ12017"]
+st.header("Financials")
 
 if Ticker in DATA["Ticker "].values:
+    #EV vs EBIT
+    ev_peer =  comp_data[[column for column in comp_data.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
+    ev_peer = (ev_peer - comp_data[[column for column in comp_data.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
+    ebit_peer = comp_data[[column for column in comp_data.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)/1000
+    peer_df = pd.concat([ev_peer.mean(axis=1),ebit_peer.mean(axis=1),DATA["Industry"]],axis=1).set_axis(["EV","EBIT","Industry"],axis=1)
+    chart = alt.Chart(source).mark_circle().encode(x='Horsepower',y='Miles_per_Gallon', color='Origin',).interactive()
+    st.altair_chart(chart, theme="streamlit", use_container_width=True)
+   
     comp_data = DATA[DATA["Ticker "]==Ticker]
-
-
 
     # P&L
     sale_val     = comp_data[[column for column in comp_data.columns if column.startswith('Total Revenue')]].set_axis(axis_v,axis=1)
@@ -260,10 +266,14 @@ if Ticker in DATA["Ticker "].values:
     book_val     = comp_data[[column for column in comp_data.columns if column.startswith('Common Stock')]].set_axis(axis_v,axis=1)
     mcap_val = comp_data[[column for column in comp_data.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
     fr_fm_val = comp_data[[column for column in comp_data.columns if column.startswith('fr_fm')]].set_axis(axis_v,axis=1)
-    fins = pd.concat([sale_val.T,ebitda_val.T,ib_val.T],axis=1).set_axis(["Sales","EBIT","Net Income"],axis = 1)/1000
-    fins = fins.iloc[::-1]
+    ev = mcap_val + net_debt_val
+    fins_cf = pd.concat([sale_val.T,ebitda_val.T,ib_val.T],axis=1).set_axis(["Sales","EBIT","Net Income"],axis = 1)/1000
+    fins_bs = pd.concat([debt_val.T,book_val.T].set_axis(["Debt","Equity"],axis = 1)/1000        
+    fins_cf = fins.iloc[::-1]
     
-    st.area_chart(fins, use_container_width=False)
+    st.area_chart(fins_cf, use_container_width=False)
+    st.bar_chart(fins_bs, use_container_width=False)
+    st.
 else:
     st.write("Ops, the ticker you've chosen is not available at current moment. We are working hard to improve our product and will add your desired company into our dataset")
     
