@@ -310,17 +310,20 @@ if Ticker in DATA["Ticker "].values:
    fins_bs = (pd.concat([debt_val.T,book_val.T],axis=1).set_axis(["Debt","Equity"],axis = 1)/1000).iloc[::-1] 
 
    #P/E
-   m_up,m_down = float(mcap_val.mean(1)+mcap_val.std(1)*2), float(mcap_val.mean(1)-mcap_val.std(1)*2)
-   ni_up,ni_down = float(ib_val.std(1)+ib_val.mean(1)*2), float(ib_val.mean(1)-ib_val.std(1)*2)
+   m_up,m_down = float(mcap_val.median(1)+mcap_val.std(1)*5), float(mcap_val.median(1)-mcap_val.std(1)*5)
+   ni_up,ni_down = float(ib_val.std(1)+ib_val.mean(1)*5), float(ib_val.mean(1)-ib_val.std(1)*5)
   
    mcap_peer =  DATA[[column for column in DATA.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
    mcap_peer = mcap_peer[(mcap_peer<=m_up)&(mcap_peer>=m_down)]
    ni_peer = DATA[[column for column in DATA.columns if column.startswith('Net Income (')]].set_axis(axis_v,axis=1)
    ni_peer = ni_peer[(ni_peer<=ni_up)&(ni_peer>=ni_down)]
    #EV/EBIT
+   sales_up,sale_down = float(sales_val.mean(1)+sales_val.std(1)*5), float(sales_val.mean(1)-sales_val.std(1)*5)
+   ebit_up,ebit_down = float(ebit_val.std(1)+ebit_val.mean(1)*5), float(ib_val.mean(1)-ib_val.std(1)*5)
+  
    ev_peer = (mcap_peer - DATA[[column for column in DATA.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
    ebit_peer = DATA[[column for column in DATA.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)
-   ebit_peer = ebit_peer[(ebit_peer<10**6)&((ebit_peer>=-0.5*10*3))]
+   ebit_peer = ebit_peer[(ebit_peer<=ebit_up)&((ebit_peer>=ebit_down))]
    sales_peer = DATA[[column for column in DATA.columns if column.startswith('Total Revenue')]].set_axis(axis_v,axis=1)
    sales_peer = sales_peer[(sales_peer<10**7)&((sales_peer>=0))]
    
