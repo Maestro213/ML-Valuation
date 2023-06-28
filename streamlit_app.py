@@ -361,7 +361,7 @@ else:
   st.write("Ops, the ticker you've chosen is not available at current moment. We are working hard to improve our product and will add your desired company into our dataset")
   
 
-  lottie_url = https://assets9.lottiefiles.com/packages/lf20_3kjzsbjv.json
+  lottie_url = "https://assets9.lottiefiles.com/packages/lf20_3kjzsbjv.json"
   st_lottie(lottie_url,key="user")
   
   sale_val     = 10000.0
