@@ -320,7 +320,7 @@ if Ticker in DATA["Ticker "].values:
    #EV/EBIT
   
    sale_up,sale_down = float(sale_val.mean(1)+sale_val.std(1)*5), float(sale_val.mean(1)-sale_val.std(1)*5)
-   ebit_up,ebit_down = float(ebit_val.std(1)+ebit_val.mean(1)*5), float(ib_val.mean(1)-ib_val.std(1)*5)
+   ebit_up,ebit_down = float(ib_val.std(1)+ib_val.mean(1)*5), float(ib_val.mean(1)-ib_val.std(1)*5)
   
    ev_peer = (mcap_peer - DATA[[column for column in DATA.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
    ebit_peer = DATA[[column for column in DATA.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)
