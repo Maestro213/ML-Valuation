@@ -362,14 +362,7 @@ else:
   url = requests.get("https://iconscout.com/lottie/stock-market-chart-8833053.json")
   # Creating a blank dictionary to store JSON file,
   # as their structure is similar to Python Dictionary
-  url_json = dict(url)
-    
-  if url.status_code == 200:
-      url_json = url.json()
-  else:
-      print("Error in the URL")
-      
-  
+  url_json = url.json()
 
   
   st_lottie(url_json)
