@@ -18,7 +18,58 @@ import yfinance as yf
 
 
 DATA = pd.concat([pd.read_csv(r'Vars_small1.csv'),pd.read_csv(r'Vars_small2.csv'),pd.read_csv(r'Vars_small3.csv')])
-ff49 = DATA.Industry.drop_duplicates().values.tolist()
+ff49 = [
+    '1-Agriculture',
+    '2-Food Products',
+    '3-Candy & Soda',
+    '4-Beer & Liquor',
+    '5-Tobacco Products',
+    '6-Recreation',
+    '7-Entertainment',
+    '8-Printing and Publishing',
+    '9-Consumer Goods',
+    '10-Apparel',
+    '11-Healthcare',
+    '12-Medical Equipment',
+    '13-Pharmaceutical Products',
+    '14-Chemicals',
+    '15-Rubber and Plastic Products',
+    '16-Textiles',
+    '17-Construction Materials',
+    '18-Construction',
+    '19-Steel Works Etc',
+    '20-Fabricated Products',
+    '21-Machinery',
+    '22-Electrical Equipment',
+    '23-Automobiles and Trucks',
+    '24-Aircraft',
+    '25-Shipbuilding',
+    '26-Defense',
+    '27-Precious Metals',
+    '28-Non-Metallic and Industrial Metal Mining',
+    '29-Coal',
+    '30-Petroleum and Natural Gas',
+    '31-Utilities',
+    '32-Communication',
+    '33-Personal Services',
+    '34-Business Services',
+    '35-Computers',
+    '36-Computer Software',
+    '37-Electronic Equipment',
+    '38-Measuring and Control Equipment',
+    '39-Business Supplies',
+    '40-Shipping Containers',
+    '41-Transportation',
+    '42-Wholesale',
+    '43-Retail',
+    '44-Restaurants',
+    '45-Banking',
+    '46-Insurance',
+    '47-Real Estate',
+    '48-Trading',
+    '49-Almost Nothing or Missing'
+]
+
 c = DATA['Country/Region Code '].drop_duplicates().values.tolist()
 # Background
 st.sidebar.header("Valuation Inputs")
