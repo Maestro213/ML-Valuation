@@ -311,7 +311,7 @@ if Ticker in DATA["Ticker "].values:
 
    #P/E
    m_up,m_down = float(mcap_val.std(1)+mcap_val.mean(1)), float(mcap_val.mean(1)-mcap_val.std(1))
-   ni_up,ni_down = float(ib_val.std(1)+ib.mean(1)), float(ib_val.mean(1)-ib_val.std(1))
+   ni_up,ni_down = float(ib_val.std(1)+ib_val.mean(1)), float(ib_val.mean(1)-ib_val.std(1))
   
    mcap_peer =  DATA[[column for column in DATA.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
    mcap_peer = mcap_peer[(mcap_peer<=m_up)&(mcap_peer>=m_down)]
