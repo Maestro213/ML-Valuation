@@ -280,8 +280,6 @@ else:
     mcap_val = "Not available at the current moment"
     fr_fm_val = 1
     
-
-rate1yr  = st.sidebar.slider('1 Year Real Treasury Yield - %',  min_value = -5.0, max_value=12.0, step=0.1, value=2.0) / 100
 # P&L
 sale     = st.sidebar.number_input('Sales - $ mn', min_value=0.0, max_value=1000000.0,value=sale_val.values[0,1]/1000, step=10.0)
 ebitda   = st.sidebar.number_input('EBIT - $ mn', min_value=0.0, max_value=sale, value= ebitda_val.values[0,1]/1000, step=10.0)
