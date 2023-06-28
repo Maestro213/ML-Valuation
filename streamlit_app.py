@@ -268,8 +268,8 @@ if Ticker in DATA["Ticker "].values:
     fr_fm_val = comp_data[[column for column in comp_data.columns if column.startswith('fr_fm')]].set_axis(axis_v,axis=1)
     ev = mcap_val + net_debt_val
     fins_cf = pd.concat([sale_val.T,ebitda_val.T,ib_val.T],axis=1).set_axis(["Sales","EBIT","Net Income"],axis = 1)/1000
-    fins_bs = pd.concat([debt_val.T,book_val.T].set_axis(["Debt","Equity"],axis = 1)/1000        
-    fins_cf = fins.iloc[::-1]
+    fins_bs = (pd.concat([debt_val.T,book_val.T].set_axis(["Debt","Equity"],axis = 1)/1000).iloc[::-1]        
+    fins_cf = fins_cf.iloc[::-1]
     
     st.area_chart(fins_cf, use_container_width=False)
     st.bar_chart(fins_bs, use_container_width=False)
