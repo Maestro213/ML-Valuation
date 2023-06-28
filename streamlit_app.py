@@ -241,8 +241,8 @@ if Ticker in DATA["Ticker "].values:
    mcap_peer =  DATA[[column for column in DATA.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
    mcap_peer = mcap_peer[mcap_peer<=1*10**14]
    ni_peer = DATA[[column for column in DATA.columns if column.startswith('Net Income (')]].set_axis(axis_v,axis=1)
+   ni_peer = ni_peer[ni_peer<=2.5*10*6]
    ev_peer = (mcap_peer - DATA[[column for column in DATA.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
-   
    ebit_peer = DATA[[column for column in DATA.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)
    ebit_peer = ebit_peer[(ebit_peer<10**6)&((ebit_peer>=-0.5*10*3))]
    sales_peer = DATA[[column for column in DATA.columns if column.startswith('Total Revenue')]].set_axis(axis_v,axis=1)
@@ -281,7 +281,7 @@ if Ticker in DATA["Ticker "].values:
    chart1 = alt.Chart(peer_df).mark_circle().encode(x='Sales',y='EV',color='Industry',).interactive()
    chart2 = alt.Chart(peer_df).mark_circle().encode(x='Net Income',y='MCap',color='Industry',).interactive()
    
-   tab1, tab2 = st.tabs(["EV/Sales", "EV/EBIT"])
+   tab1, tab2 = st.tabs(["EV/Sales", "P/E"])
 
    with tab1:
        # Use the Streamlit theme.
