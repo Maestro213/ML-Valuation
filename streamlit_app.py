@@ -115,7 +115,7 @@ chartMultipaneOptions = [
         "layout": {
             "background": {
                 "type": "solid",
-                "color": 'black'
+                "color": 'transparent'
             },
             "textColor": "white"
         },
@@ -182,7 +182,7 @@ chartMultipaneOptions = [
         "layout": {
             "background": {
                 "type": "solid",
-                "color": 'black'
+                "color": 'transparent'
             },
             "textColor": "white"
         },
