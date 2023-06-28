@@ -347,7 +347,7 @@ st.header('Machine Valuation')
 
 st.subheader('Estimated EBITDA Valuation Multiple')
 
-st.write(f"EBITDA multiple = ** {multiple} x **")
+st.write(f"EBITDA multiple = **{multiple} x**")
 
 st.subheader('Estimated Enterprise Valuation')
 
