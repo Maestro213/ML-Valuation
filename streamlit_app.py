@@ -317,7 +317,18 @@ if Ticker in DATA["Ticker "].values:
    fr_fm_val = comp_data[[column for column in comp_data.columns if column.startswith('fr_fm')]].set_axis(axis_v,axis=1)
    ev = mcap_val + net_debt_val
    fins_cf = (pd.concat([sale_val.T,ebitda_val.T,ib_val.T],axis=1).set_axis(["Sales","EBIT","Net Income"],axis = 1)/1000).iloc[::-1]
-   fins_bs = (pd.concat([debt_val.T,book_val.T],axis=1).set_axis(["Debt","Equity"],axis = 1)/1000).iloc[::-1]        
+   fins_bs = (pd.concat([debt_val.T,book_val.T],axis=1).set_axis(["Debt","Equity"],axis = 1)/1000).iloc[::-1] 
+
+   #Rearrange Values
+   sale_val     = sale_val.values[0,1]/1000
+   ebitda_val   = ebitda_val.values[0,1]/1000
+   ib_val       = ib_val.values[0,1]/1000
+   
+   # Balancesheet
+   debt_val     = debt_val.values[0,1]/1000
+   book_val     = book_val.values[0,1]/1000
+   
+
    #Plotting the results
    
    data_container = st.container()
@@ -365,13 +376,13 @@ industry = ff49.index(selected_ff49) + 1 # python is zero-indexed, FF49 starts a
 #Rate
 rate1yr  = st.sidebar.slider('1 Year Real Treasury Yield - %',  min_value = -2.0, max_value=12.0, step=0.1, value=2.0) / 100
 # P&L
-sale     = st.sidebar.number_input('Sales - $ mn', min_value=0.0, max_value=1000000.0,value=sale_val.values[0,1]/1000, step=10.0)
-ebitda   = st.sidebar.number_input('EBIT - $ mn', min_value=0.0, max_value=sale, value= ebitda_val.values[0,1]/1000, step=10.0)
-ib       = st.sidebar.number_input('Income After Tax - $ mn', min_value=-100000.0, max_value=1000000.0, value=ib_val.values[0,1]/1000, step=10.0)
+sale     = st.sidebar.number_input('Sales - $ mn', min_value=0.0, max_value=1000000.0,value=sale_val, step=10.0)
+ebitda   = st.sidebar.number_input('EBIT - $ mn', min_value=0.0, max_value=sale, value= ebitda_val, step=10.0)
+ib       = st.sidebar.number_input('Income After Tax - $ mn', min_value=-100000.0, max_value=1000000.0, value=ib_val, step=10.0)
 
 # Balancesheet
-debt     = st.sidebar.number_input('Total Debt - $ mn', min_value=0.0, max_value=1000000.0, value=debt_val.values[0,1]/1000 , step=10.0)
-book     = st.sidebar.number_input('Book Value of Equity - $ mn', min_value=0.0, max_value=1000000.0, value=book_val.values[0,1]/1000, step=10.0)
+debt     = st.sidebar.number_input('Total Debt - $ mn', min_value=0.0, max_value=1000000.0, value=debt_val , step=10.0)
+book     = st.sidebar.number_input('Book Value of Equity - $ mn', min_value=0.0, max_value=1000000.0, value=book_val, step=10.0)
 
 # Calculated items
 
