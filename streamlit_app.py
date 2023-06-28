@@ -273,7 +273,7 @@ if Ticker in DATA["Ticker "].values:
    
    st.area_chart(fins_cf, use_container_width=False)
    st.bar_chart(fins_bs, use_container_width=False)
-   chart = alt.Chart(peer_df).mark_circle().encode(x='EBIT',y='EV',color='Industry',).interactive()
+   chart = alt.Chart(peer_df).mark_circle().encode(x='Sales',y='EV',color='Industry',).interactive()
    st.altair_chart(chart, theme="streamlit", use_container_width=True)
 else:
    st.write("Ops, the ticker you've chosen is not available at current moment. We are working hard to improve our product and will add your desired company into our dataset")
