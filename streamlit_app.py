@@ -291,7 +291,7 @@ st.header("Financials")
 
 if Ticker in DATA["Ticker "].values:
    
-   th= 3
+   th= 2
    comp_data = DATA[DATA["Ticker "]==Ticker]
    
    # P&L
