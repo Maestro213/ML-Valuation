@@ -238,15 +238,18 @@ st.header("Financials")
 
 if Ticker in DATA["Ticker "].values:
    #EV vs EBIT
-   ev_peer =  DATA[[column for column in DATA.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
-   ev_peer = (ev_peer - DATA[[column for column in DATA.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
-   ev_peer = ev_peer[ev_peer<=1*10**14]
+   mcap_peer =  DATA[[column for column in DATA.columns if column.startswith('MCap')]].set_axis(axis_v,axis=1)
+   mcap_peer = mcap_peer[mcap_peer<=1*10**14]
+   ni_peer = DATA[[column for column in DATA.columns if column.startswith('Net Income (')]].set_axis(axis_v,axis=1)
+   ev_peer = (mcap_peer - DATA[[column for column in DATA.columns if column.startswith('Net Debt')]].set_axis(axis_v,axis=1))
+   
    ebit_peer = DATA[[column for column in DATA.columns if column.startswith('EBIT (')]].set_axis(axis_v,axis=1)
    ebit_peer = ebit_peer[(ebit_peer<10**6)&((ebit_peer>=-0.5*10*3))]
    sales_peer = DATA[[column for column in DATA.columns if column.startswith('Total Revenue')]].set_axis(axis_v,axis=1)
    sales_peer = sales_peer[(sales_peer<10**7)&((sales_peer>=0))]
-   peer_df = pd.concat([ev_peer.iloc[:,-2],sales_peer.iloc[:,-2],ebit_peer.iloc[:,-2],DATA["Industry"]],axis=1).set_axis(["EV","Sales","EBIT","Industry"],axis=1).dropna()
    
+   peer_df = pd.concat([ev_peer.iloc[:,-2],sales_peer.iloc[:,-2],ebit_peer.iloc[:,-2],mcap_peer.iloc[:,-2],ni_peer.iloc[:,-2],DATA["Industry"]]
+                       ,axis=1).set_axis(["EV","Sales","EBIT","MCap","Net Income","Industry"],axis=1).dropna()
    
    comp_data = DATA[DATA["Ticker "]==Ticker]
    
@@ -276,16 +279,16 @@ if Ticker in DATA["Ticker "].values:
    
    
    chart1 = alt.Chart(peer_df).mark_circle().encode(x='Sales',y='EV',color='Industry',).interactive()
-   chart2 = alt.Chart(peer_df).mark_circle().encode(x='Sales',y='EV',color='Industry',).interactive()
+   chart2 = alt.Chart(peer_df).mark_circle().encode(x='Net Income',y='MCap',color='Industry',).interactive()
    
-   tab1, tab2 = st.tabs(["Streamlit ", "Altair native theme"])
+   tab1, tab2 = st.tabs(["EV/Sales", "EV/EBIT"])
 
    with tab1:
        # Use the Streamlit theme.
        st.altair_chart(chart1, theme="streamlit", use_container_width=True)
    with tab2:
        # Use the native Altair theme.
-       st.altair_chart(chart2, theme=None, use_container_width=True)
+       st.altair_chart(chart2, theme="streamlit", use_container_width=True)
       
       
 
