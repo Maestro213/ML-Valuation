@@ -10,10 +10,6 @@ import altair as alt
 from streamlit_lottie import st_lottie
   
 
-import yfinance as yf
-
-
-
 # Fama French 49 industries
 # see https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/Data_Library/det_49_ind_port.html
 
@@ -90,11 +86,11 @@ st.header("Price and Volume")
 COLOR_BULL = 'rgba(38,166,154,0.9)' # #26a69a
 COLOR_BEAR = 'rgba(239,83,80,0.9)'  # #ef5350
 # Request historic pricing data via finance.yahoo.com API
-df = yf.Ticker(Ticker).history(period='4mo')[['Open', 'High', 'Low', 'Close', 'Volume']]
+df = pd.read_csv(r'tickers.csv')
 
 # Some data wrangling to match required format
 df = df.reset_index()
-df.columns = ['time','open','high','low','close','volume']                  # rename columns
+df.columns = ['time','close','volume','open','high','low']                  # rename columns
 df['time'] = df['time'].dt.strftime('%Y-%m-%d')                             # Date to string
 df['color'] = np.where(  df['open'] > df['close'], COLOR_BEAR, COLOR_BULL)  # bull or bear
 df.ta.macd(close='close', fast=6, slow=12, signal=5, append=True)           # calculate macd
