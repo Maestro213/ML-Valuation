@@ -90,6 +90,7 @@ df = pd.read_csv(r'tickers.csv')
 
 # Some data wrangling to match required format
 df.columns = ['time','close','volume','open','high','low']                  # rename columns
+df['time'] = pd.to_datetime(df['time'], format='%m/%d/%Y', errors='coerce') # covert american to date time 
 df['time'] = df['time'].dt.strftime('%Y-%m-%d')                             # Date to string
 df['color'] = np.where(  df['open'] > df['close'], COLOR_BEAR, COLOR_BULL)  # bull or bear
 df.ta.macd(close='close', fast=6, slow=12, signal=5, append=True)           # calculate macd
