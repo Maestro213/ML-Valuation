@@ -89,7 +89,6 @@ COLOR_BEAR = 'rgba(239,83,80,0.9)'  # #ef5350
 df = pd.read_csv(r'tickers.csv')
 
 # Some data wrangling to match required format
-df = df.reset_index()
 df.columns = ['time','close','volume','open','high','low']                  # rename columns
 df['time'] = df['time'].dt.strftime('%Y-%m-%d')                             # Date to string
 df['color'] = np.where(  df['open'] > df['close'], COLOR_BEAR, COLOR_BULL)  # bull or bear
